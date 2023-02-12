@@ -630,7 +630,7 @@ func TestRetrieveCertificate(t *testing.T) {
 			givenTimeout: 3 * time.Second,
 		},
 		{
-			name: "should succeed even without a Format",
+			name: "should succeed even without a Request Format",
 			mockRetrieve: []mockResp{
 				{`500 Certificate \VED\Policy\TLS/SSL\aexample.com has encountered an error while processing, Status: WebSDK CertRequest Module Requested Certificate, Stage: 500.`,
 					`{"Stage": 500, "Status": "WebSDK CertRequest Module Requested Certificate"}`},
