@@ -626,6 +626,42 @@ func TestRetrieveCertificate(t *testing.T) {
 				{`500 Certificate \VED\Policy\TLS/SSL\aexample.com has encountered an error while processing, Status: WebSDK CertRequest Module Requested Certificate, Stage: 500.`,
 					`{"Stage": 500, "Status": "WebSDK CertRequest Module Requested Certificate"}`},
 			},
+			mockReset:    mockResp{`200 OK`, `{"ProcessingResetCompleted": true}`},
+			givenTimeout: 3 * time.Second,
+		},
+		{
+			name: "should succeed even without a Format",
+			mockRetrieve: []mockResp{
+				{`500 Certificate \VED\Policy\TLS/SSL\aexample.com has encountered an error while processing, Status: WebSDK CertRequest Module Requested Certificate, Stage: 500.`,
+					`{"Stage": 500, "Status": "WebSDK CertRequest Module Requested Certificate"}`},
+				{`202 Certificate \VED\Policy\TLS/SSL\aexample.com being processed, Status: Post CSR, Stage: 500.`,
+					`{"Stage": 500, "Status": "Post CSR"}`},
+				{`200 OK`,
+					`{"CertificateData":"` + certData + `","Filename":"bexample.com.cer"}`},
+			},
+			mockReset:    mockResp{`200 OK`, `{"ProcessingResetCompleted": true}`},
+			givenTimeout: 3 * time.Second,
+		},
+		{
+			name: "should fail after resetting msg WebSDK CertRequest and enrollment fails",
+			mockRetrieve: []mockResp{
+				{`500 Certificate \VED\Policy\TLS/SSL\aexample.com has encountered an error while processing, Status: WebSDK CertRequest Module Requested Certificate, Stage: 500.`,
+					`{"Stage": 500, "Status": "WebSDK CertRequest Module Requested Certificate"}`},
+				{`500 Certificate \VED\Policy\TLS/SSL\aexample.com has encountered an error while processing, Status: Post CSR failed with error: Cannot connect to the certificate authority (CA)., Stage: 500.`,
+					`{"Stage": 500, "Status": "Post CSR failed with error: Cannot connect to the certificate authority (CA)."}`},
+			},
+			mockReset: mockResp{`200 OK`, `{"ProcessingResetCompleted": true}`},
+			expectErr: "unable to retrieve: Unexpected status code on TPP Certificate Retrieval. Status: 500 Certificate \\VED\\Policy\\TLS/SSL\\aexample.com has encountered an error while processing, Status: Post CSR failed with error: Cannot connect to the certificate authority (CA)., Stage: 500.",
+		},
+		{
+			name: "should fail if msg WebSDK shows twice in a row",
+			mockRetrieve: []mockResp{
+				{`500 Certificate \VED\Policy\TLS/SSL\aexample.com has encountered an error while processing, Status: WebSDK CertRequest Module Requested Certificate, Stage: 500.`,
+					`{"Stage": 500, "Status": "WebSDK CertRequest Module Requested Certificate"}`},
+				{`500 Certificate \VED\Policy\TLS/SSL\aexample.com has encountered an error while processing, Status: WebSDK CertRequest Module Requested Certificate, Stage: 500.`,
+					`{"Stage": 500, "Status": "WebSDK CertRequest Module Requested Certificate"}`},
+			},
+			mockReset: mockResp{`200 OK`, `{"ProcessingResetCompleted": true}`},
 			expectErr: "unable to retrieve: Unexpected status code on TPP Certificate Retrieval. Status: 500 Certificate \\VED\\Policy\\TLS/SSL\\aexample.com has encountered an error while processing, Status: WebSDK CertRequest Module Requested Certificate, Stage: 500.",
 		},
 		{
