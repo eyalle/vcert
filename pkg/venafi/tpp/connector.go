@@ -1201,6 +1201,8 @@ func (c *Connector) RetrieveCertificate(req *certificate.Request) (certificates 
 
 	includeChain := req.ChainOption != certificate.ChainOptionIgnore
 	rootFirstOrder := includeChain && req.ChainOption == certificate.ChainOptionRootFirst
+
+	// if Request doesn't contain a Fornat, use defaults
 	if req.Format == "" {
 		if req.KeyType == certificate.KeyTypeRSA {
 			req.Format = "Base64 (PKCS #8)"
