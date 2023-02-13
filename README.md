@@ -164,3 +164,4 @@ Copyright &copy; Venafi, Inc. All rights reserved.
 VCert is licensed under the Apache License, Version 2.0. See `LICENSE` for the full license text.
 
 Please direct questions/comments to opensource@venafi.com.
+
